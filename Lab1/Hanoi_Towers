@@ -1,0 +1,114 @@
+
+class Piramid
+{
+public:
+    Piramid();
+    Piramid(size_t quantity);
+    std::vector<std::string>& operator[](size_t);
+    const size_t getMaxSize() { return max_size_of_circle;}
+    const size_t getQuantity() { return q; }
+
+private:
+    std::vector<std::string> one;
+    std::vector<std::string> two;
+    std::vector<std::string> three;
+    int max_size_of_circle = 0;
+    int q = 0;
+};
+
+
+
+Piramid::Piramid()
+{
+    max_size_of_circle = 0;
+    q = 0;
+}
+
+Piramid::Piramid(size_t quantity)
+{
+    std::string circles = "##";
+    one.push_back(circles);
+    for (size_t i = 1; i < quantity; ++i)
+    {
+        size_t counts = 2 + circles.size();
+        circles.clear();
+        for (size_t j = 0; j < counts; ++j)
+            circles.push_back('#');
+        one.push_back(circles);
+    }
+    max_size_of_circle = circles.size();
+    q = quantity;
+    two = std::vector<std::string>(quantity);
+    three = std::vector<std::string>(quantity);
+}
+
+std::vector<std::string>& Piramid::operator[](size_t index)
+{
+    if (index == 1) return one;
+    if (index == 2) return two;
+    return three;
+}
+
+std::ostream& operator<<(std::ostream& stream, Piramid piramid) {
+    //цикл, который бегает по ячейкам внутри вектора
+    for (size_t i = 0; i < piramid.getQuantity(); ++i)
+    {
+        //цикл, который бегает внутри класса пирамида
+        for (size_t j = 1; j <= 3; ++j) {
+            //проверка на пустоту строки внутри вектора, который внутри класса
+            if (!piramid[j][i].size()) {
+                stream << std::setfill(' ') << std::setw(piramid.getMaxSize() / 2) << "|" << std::setfill(' ') << std::setw(piramid.getMaxSize() / 2) << " ";
+            }
+            else{
+                size_t count_of_spaces = piramid.getMaxSize();//количество пробелов, которые ставим перед и после символа
+                                                              //чтобы ёлочка центрированная
+                count_of_spaces -= piramid[j][i].size();
+                count_of_spaces /= 2;
+                //выводим двумя циклами разделители и между ними символ(строку)
+                for (size_t k = 0; k < count_of_spaces; ++k)
+                    stream << ' ';
+                stream << piramid[j][i];
+                for (size_t k = 0; k < count_of_spaces; ++k)
+                    stream << ' ';
+            }
+            stream << "      "; //разделяем 3 ёлочки
+        }
+        stream << '\n';
+    }
+    return stream;
+}
+
+int hanoi_towers(int quantity, int from, int to, int buf_peg, Piramid& piramida)	{
+
+    static int counts = 0;
+                                
+    if (quantity != 0)
+    {
+        hanoi_towers(quantity - 1, from, buf_peg, to, piramida);
+
+
+        std::cout << from << " -> " << to << std::endl;
+        //вывод пирамиды
+        for (size_t i = 0; i < piramida[from].size(); ++i)
+        {
+            if (!piramida[from][i].empty()) {
+                for (size_t j = piramida[to].size(); j > 0; --j)
+                {
+                    if (piramida[to][j - 1].empty()) {
+                        std::string buf = piramida[from][i];
+                        piramida[to][j - 1] = buf;
+                        break;
+                    }
+                }
+                piramida[from][i].clear();
+                break;
+
+            }
+        }
+        std::cout << piramida << std::endl;
+        ++counts;
+
+        hanoi_towers(quantity - 1, buf_peg, to, from, piramida);
+    }
+    return counts;
+}
