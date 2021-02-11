@@ -1,0 +1,5 @@
+const int& NOD(int a, int b) {
+    if (a < 0) a = -a;
+    if (b < 0) b = -b;
+    return  (!b) ? a : NOD(b, a % b);
+}
