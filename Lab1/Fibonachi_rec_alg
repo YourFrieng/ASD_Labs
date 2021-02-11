@@ -1,0 +1,21 @@
+const int& fibonachi(const int& n) {
+    if (n == 0 || n == 1) return 1;
+    if (n < 0) return 0;
+    return fibonachi(n - 1) + fibonachi(n - 2);;
+}
+
+const int& fibonachi(const int& n) {
+    switch (n)
+    {
+
+    case 0: return 1;
+        break;
+
+    case 1: return 1;
+        break;
+
+    default: return (n < 0) ?  0 : fibonachi(n - 1) + fibonachi(n - 2);
+        break;
+    }
+}
+
