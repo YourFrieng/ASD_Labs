@@ -1,0 +1,125 @@
+//method chains
+#include <iostream>
+#include <list>
+#include <memory>
+#include <stdio.h> 
+#include <time.h>
+
+class HashTable{
+    std::list<int>* hash_massive;
+    size_t size;
+    int hash(int);
+public:
+    HashTable():hash_massive(nullptr), size(0){};
+    void setSize(size_t size);
+    void add(int) noexcept;
+    void print();
+    std::list<int>::iterator search(int);
+    void erase(int);
+    void erase(std::list<int>::iterator);
+    ~HashTable(){ delete[] hash_massive;};
+};
+
+std::list<int>::iterator HashTable::search(int num){
+    for (auto beg = hash_massive[hash(num)].begin(); beg != hash_massive[hash(num)].end(); ++beg)
+    {
+        if(*beg == num)
+            return beg;
+    }
+    return hash_massive[hash(num)].end();
+}
+
+void HashTable::erase(int num){
+    int key = hash(num);
+    for (auto beg = hash_massive[key].begin(); beg != hash_massive[key].end(); ++beg)
+    {
+        if(*beg == num){
+            hash_massive[key].erase(beg);
+            break;
+        }
+    }
+}
+
+void HashTable::erase(std::list<int>::iterator key){
+
+    hash_massive[hash(*key)].erase(key);
+
+}
+
+void HashTable::setSize(size_t size){
+    this->size = size;
+    hash_massive = new std::list<int>[size];
+}
+
+
+int HashTable::hash(int num){
+    int key = num % size;
+    return key;
+}
+
+void HashTable::add(int num) noexcept{
+    if(size){
+        hash_massive[hash(num)].insert(hash_massive[hash(num)].end(), num);
+    }
+}
+
+void HashTable::print(){
+    for (size_t i = 0; i < size; i++)
+    {
+        for (auto a : hash_massive[i])
+        {
+            std::cout << a << " ";
+        }
+        std::cout << std::endl;
+    }
+    
+}
+
+int main(){
+    HashTable mytable;
+    int k;
+    std::cin >> k;
+    mytable.setSize(k);
+    double average = 0;
+    int counter = 0;
+    while (k)
+    {
+        std::cin >> k;
+        clock_t start = clock();
+        mytable.add(k);
+        clock_t end = clock();
+        std::cout << "TIME: " << (double)(end - start) / (CLOCKS_PER_SEC / 1000) << std::endl;
+        average += (double)(end - start) / (CLOCKS_PER_SEC / 1000);
+        ++counter;
+    }
+
+    std::cout << "Average time : " << average / counter << std::endl;
+    mytable.print();
+
+    std::cout << "Search : " << std::endl;
+    std::cin >> k;
+    clock_t start = clock();
+    mytable.search(k);
+    clock_t end = clock();
+    std::cout << "TIME: " << (double)(end - start) / (CLOCKS_PER_SEC / 1000) << std::endl;
+
+    std::cout << "Erase : " << std::endl;
+    std::cin >> k;
+    start = clock();
+    mytable.erase(k);
+    end = clock();
+    std::cout << "TIME: " << (double)(end - start) / (CLOCKS_PER_SEC / 1000) << std::endl;
+
+    mytable.print();
+
+    std::cout << "Erase with key search: " << std::endl;
+    std::cin >> k;
+    start = clock();
+    mytable.erase(mytable.search(k));
+    end = clock();
+    std::cout << "TIME: " << (double)(end - start) / (CLOCKS_PER_SEC / 1000) << std::endl;
+
+    mytable.print();
+
+    return 0;
+}
